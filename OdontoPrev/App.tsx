@@ -1,16 +1,24 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, ImageBackground, Image } from "react-native";
+import { StyleSheet, Text, View, ImageBackground, Image, Pressable } from "react-native";
 
 export default function App() {
   return (
     <ImageBackground
-      source={require("./assets/background.png")} // Corrigindo caminho
+      source={require("./assets/background.png")}
       resizeMode="cover"
-      style={styles.background} // Aplicando estilo para ocupar a tela toda
+      style={styles.background}
     >
       <View style={styles.container}>
-       
-        <Text style={styles.text}>Open up App.tsx to start working on your app!</Text>
+        <Image source={require("./assets/logo.png")} style={styles.logo} />
+        
+        <Text style={styles.text}>
+          Cuide do seu sorriso com acompanhamento personalizado e preventivo. Cadastre-se e monitore sua saúde bucal e se divirta com a OdontoPrev.
+        </Text>
+        
+        <Pressable style={styles.btn}>
+          <Text style={styles.btnAcessar}>Acessar</Text>
+        </Pressable>
+
         <StatusBar style="auto" />
       </View>
     </ImageBackground>
@@ -19,17 +27,42 @@ export default function App() {
 
 const styles = StyleSheet.create({
   background: {
-    flex: 1, // Ocupa a tela toda
+    flex: 1, 
   },
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "transparent", // Garante que a View não cubra a imagem de fundo
+    backgroundColor: "transparent", 
+    margin: 10,
+    paddingVertical: 20, // Melhorando o espaçamento vertical
+  },
+  logo: {
+    width: 400, // Definindo um tamanho fixo para a logo
+    height: 150,
+    resizeMode: "contain", 
+    marginBottom: 100, // Espaçamento abaixo da logo
   },
   text: {
-    color: "#fff", // Deixa o texto branco para ser visível caso o fundo seja escuro
-    fontSize: 16,
+    color: "#033EA6", 
+    fontSize: 20, // Ajuste para melhor leitura
     fontWeight: "bold",
+    textAlign: "center",
+    marginHorizontal: 20, // Adiciona margem para evitar tocar nas bordas
+    marginBottom: 100,
   },
+  btn: {
+    backgroundColor: "#6AE9FF",
+    paddingVertical: 12, // Melhor ajuste do tamanho do botão
+    paddingHorizontal: 30, // Melhor que width fixa
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 100,
+  },
+  btnAcessar: {
+    fontSize: 20, // Reduzindo um pouco para manter proporção
+    fontWeight: "bold",
+    color: "#033EA6",
+  }
 });
