@@ -17,7 +17,7 @@ export default function App() {
                         Cuide do seu sorriso com acompanhamento personalizado e preventivo. Cadastre-se e monitore sua saúde bucal e se divirta com a OdontoPrev.
                     </Text>
 
-                    <Link href="./landingPage" asChild>
+                    <Link href="./home" asChild>
                         <Pressable style={styles.btn}>
                             <Text style={styles.btnAcessar}>Acessar</Text>
                         </Pressable>
