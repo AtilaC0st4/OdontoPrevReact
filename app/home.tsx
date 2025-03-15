@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
 import { Text, StyleSheet, View, Pressable, } from 'react-native'
 import { Link, Router } from "expo-router";
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 
 export default class home extends Component {
   render() {
     return (
+      <SafeAreaView>
       <View>
         <Link href="./cadastroEscovacao" asChild>
           <Pressable style={styles.btn}>
@@ -24,9 +27,8 @@ export default class home extends Component {
             <Text style={styles.btnAcessar}>Veja seus Pontos</Text>
           </Pressable>
         </Link>
-
-
       </View>
+      </SafeAreaView>
     )
   }
 }
