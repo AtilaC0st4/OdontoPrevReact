@@ -3,10 +3,9 @@ import { StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { Text, View } from '@/components/Themed';
 
 export default function Cadastro() {
-  const [data, setData] = useState(''); // Estado para a data
-  const [horario, setHorario] = useState(''); // Estado para o horário
+  const [data, setData] = useState(''); 
+  const [horario, setHorario] = useState(''); 
 
-  // Função para salvar a escovação (apenas demonstração)
   const salvarEscovacao = () => {
     if (!data || !horario) {
       Alert.alert('Erro', 'Por favor, preencha a data e o horário.');
@@ -20,7 +19,7 @@ export default function Cadastro() {
     <View style={styles.container}>
       <Text style={styles.title}>Cadastro de Escovação</Text>
 
-      {/* Campo de Data */}
+     
       <TextInput
         style={styles.input}
         placeholder="Data (DD/MM/AAAA)"
@@ -28,7 +27,7 @@ export default function Cadastro() {
         onChangeText={setData}
       />
 
-      {/* Campo de Horário */}
+      
       <TextInput
         style={styles.input}
         placeholder="Horário (HH:MM)"
@@ -36,7 +35,6 @@ export default function Cadastro() {
         onChangeText={setHorario}
       />
 
-      {/* Botão para Salvar */}
       <TouchableOpacity style={styles.button} onPress={salvarEscovacao}>
         <Text style={styles.buttonText}>Salvar Escovação</Text>
       </TouchableOpacity>
@@ -68,7 +66,7 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     padding: 15,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0066FF',
     borderRadius: 10,
     alignItems: 'center',
   },

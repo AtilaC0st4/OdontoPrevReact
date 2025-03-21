@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 import React from 'react';
 
-// Definindo o tipo para cada item do histórico
+
 interface Escovacao {
   id: string;
   data: string;
@@ -10,7 +10,7 @@ interface Escovacao {
 }
 
 const Historico = () => {
-  // Dados de exemplo para o histórico de escovações
+  
   const historicoEscovacoes: Escovacao[] = [
     { id: '1', data: '2023-10-01', horario: '08:30', pontos: 50 },
     { id: '2', data: '2023-10-01', horario: '13:45', pontos: 50 },
@@ -19,7 +19,7 @@ const Historico = () => {
     { id: '5', data: '2023-10-03', horario: '07:50', pontos: 50 },
   ];
 
-  // Função para renderizar cada item da lista
+  
   const renderItem = ({ item }: { item: Escovacao }) => (
     <View style={styles.itemContainer}>
       <Text style={styles.itemData}>{item.data}</Text>
@@ -32,7 +32,7 @@ const Historico = () => {
     <View style={styles.container}>
       <Text style={styles.titulo}>Histórico de Escovações</Text>
 
-      {/* Lista de escovações */}
+      
       <FlatList
         data={historicoEscovacoes}
         renderItem={renderItem}
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   },
   itemPontos: {
     fontSize: 16,
-    color: '#4CAF50', // Verde para destacar os pontos
+    color: '#0066FF', 
     fontWeight: 'bold',
   },
 });
