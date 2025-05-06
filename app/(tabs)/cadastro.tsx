@@ -1,14 +1,25 @@
 import React, { useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, View } from '@/components/Themed';
+import { MaskedTextInput } from 'react-native-mask-text';
 
 export default function Cadastro() {
-  const [data, setData] = useState(''); 
-  const [horario, setHorario] = useState(''); 
+  const [data, setData] = useState('');
+  const [horario, setHorario] = useState('');
 
   const salvarEscovacao = () => {
     if (!data || !horario) {
       Alert.alert('Erro', 'Por favor, preencha a data e o horário.');
+      return;
+    }
+
+    if (data.length !== 10) {
+      Alert.alert('Erro', 'Data incompleta.');
+      return;
+    }
+
+    if (horario.length !== 5) {
+      Alert.alert('Erro', 'Horário incompleto.');
       return;
     }
 
@@ -19,20 +30,22 @@ export default function Cadastro() {
     <View style={styles.container}>
       <Text style={styles.title}>Cadastro de Escovação</Text>
 
-     
-      <TextInput
-        style={styles.input}
+      <MaskedTextInput
+        mask="99/99/9999"
         placeholder="Data (DD/MM/AAAA)"
+        keyboardType="numeric"
+        style={styles.input}
+        onChangeText={(text) => setData(text)}
         value={data}
-        onChangeText={setData}
       />
 
-      
-      <TextInput
-        style={styles.input}
+      <MaskedTextInput
+        mask="99:99"
         placeholder="Horário (HH:MM)"
+        keyboardType="numeric"
+        style={styles.input}
+        onChangeText={(text) => setHorario(text)}
         value={horario}
-        onChangeText={setHorario}
       />
 
       <TouchableOpacity style={styles.button} onPress={salvarEscovacao}>
