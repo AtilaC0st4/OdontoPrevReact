@@ -1,55 +1,38 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import { MaskedTextInput } from 'react-native-mask-text';
 
 export default function Cadastro() {
-  const [data, setData] = useState('');
-  const [horario, setHorario] = useState('');
+  const salvarEscovacao = async () => {
+    const agora = new Date();
+    const data = agora.toLocaleDateString('pt-BR'); // Ex: 06/05/2025
+    const horario = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); // Ex: 14:30
 
-  const salvarEscovacao = () => {
-    if (!data || !horario) {
-      Alert.alert('Erro', 'Por favor, preencha a data e o horário.');
-      return;
+    try {
+      const response = await fetch('https://sua-api.com/escovacao', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data, horario }),
+      });
+
+      if (response.ok) {
+        Alert.alert('Sucesso', `Check-in registrado em ${data} às ${horario}`);
+      } else {
+        Alert.alert('Erro', 'Falha ao registrar a escovação.');
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Erro ao conectar com a API.');
     }
-
-    if (data.length !== 10) {
-      Alert.alert('Erro', 'Data incompleta.');
-      return;
-    }
-
-    if (horario.length !== 5) {
-      Alert.alert('Erro', 'Horário incompleto.');
-      return;
-    }
-
-    Alert.alert('Sucesso', `Escovação registrada em ${data} às ${horario}`);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Cadastro de Escovação</Text>
-
-      <MaskedTextInput
-        mask="99/99/9999"
-        placeholder="Data (DD/MM/AAAA)"
-        keyboardType="numeric"
-        style={styles.input}
-        onChangeText={(text) => setData(text)}
-        value={data}
-      />
-
-      <MaskedTextInput
-        mask="99:99"
-        placeholder="Horário (HH:MM)"
-        keyboardType="numeric"
-        style={styles.input}
-        onChangeText={(text) => setHorario(text)}
-        value={horario}
-      />
+      <Text style={styles.title}>Faça o check-in e garanta +10 pontos!</Text>
 
       <TouchableOpacity style={styles.button} onPress={salvarEscovacao}>
-        <Text style={styles.buttonText}>Salvar Escovação</Text>
+        <Text style={styles.buttonText}>Fazer Check-in</Text>
       </TouchableOpacity>
     </View>
   );
@@ -66,15 +49,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    padding: 15,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    marginBottom: 15,
-    fontSize: 16,
   },
   button: {
     width: '100%',

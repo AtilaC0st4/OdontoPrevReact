@@ -1,6 +1,5 @@
-import { StyleSheet, Text, View, FlatList } from 'react-native';
-import React from 'react';
-
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, FlatList, ActivityIndicator, Alert } from 'react-native';
 
 interface Escovacao {
   id: string;
@@ -10,16 +9,28 @@ interface Escovacao {
 }
 
 const Historico = () => {
-  
-  const historicoEscovacoes: Escovacao[] = [
-    { id: '1', data: '2023-10-01', horario: '08:30', pontos: 50 },
-    { id: '2', data: '2023-10-01', horario: '13:45', pontos: 50 },
-    { id: '3', data: '2023-10-02', horario: '09:15', pontos: 50 },
-    { id: '4', data: '2023-10-02', horario: '20:00', pontos: 50 },
-    { id: '5', data: '2023-10-03', horario: '07:50', pontos: 50 },
-  ];
+  const [historico, setHistorico] = useState<Escovacao[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  
+  useEffect(() => {
+    const buscarHistorico = async () => {
+      try {
+        const response = await fetch('');
+        if (!response.ok) {
+          throw new Error('Erro ao buscar escovações');
+        }
+        const dados = await response.json();
+        setHistorico(dados);
+      } catch (error) {
+        Alert.alert('Erro', 'Não foi possível carregar o histórico.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    buscarHistorico();
+  }, []);
+
   const renderItem = ({ item }: { item: Escovacao }) => (
     <View style={styles.itemContainer}>
       <Text style={styles.itemData}>{item.data}</Text>
@@ -32,13 +43,16 @@ const Historico = () => {
     <View style={styles.container}>
       <Text style={styles.titulo}>Histórico de Escovações</Text>
 
-      
-      <FlatList
-        data={historicoEscovacoes}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.lista}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#0066FF" />
+      ) : (
+        <FlatList
+          data={historico}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.lista}
+        />
+      )}
     </View>
   );
 };
@@ -86,7 +100,7 @@ const styles = StyleSheet.create({
   },
   itemPontos: {
     fontSize: 16,
-    color: '#0066FF', 
+    color: '#0066FF',
     fontWeight: 'bold',
   },
 });
