@@ -1,31 +1,88 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, TextInput, Button, ActivityIndicator, Alert } from 'react-native';
 
 const Perfil = () => {
- 
-  const usuario = {
-    nome: 'João Silva',
-    pontos: 1250,
-    nivel: 8,
+  const [nome, setNome] = useState('');
+  const [nomeEditado, setNomeEditado] = useState('');
+  const [pontos, setPontos] = useState(0);
+  const [nivel, setNivel] = useState(0);
+  const [carregando, setCarregando] = useState(true);
+  const [salvando, setSalvando] = useState(false);
+
+  useEffect(() => {
+    const carregarUsuario = async () => {
+      try {
+        const response = await fetch('https://suaapi.com/usuario');
+        const dados = await response.json();
+
+        setNome(dados.nome);
+        setNomeEditado(dados.nome);
+        setPontos(dados.pontos);
+        setNivel(Math.floor(dados.pontos / 100)); // nível calculado aqui
+      } catch (error) {
+        Alert.alert('Erro', 'Não foi possível carregar os dados do usuário.');
+      } finally {
+        setCarregando(false);
+      }
+    };
+
+    carregarUsuario();
+  }, []);
+
+  const salvarNome = async () => {
+    if (!nomeEditado.trim()) {
+      Alert.alert('Atenção', 'O nome não pode estar vazio.');
+      return;
+    }
+
+    setSalvando(true);
+    try {
+      const response = await fetch('https://suaapi.com/usuario', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome: nomeEditado }),
+      });
+
+      if (!response.ok) throw new Error();
+
+      setNome(nomeEditado);
+      Alert.alert('Sucesso', 'Nome atualizado com sucesso!');
+    } catch {
+      Alert.alert('Erro', 'Não foi possível atualizar o nome.');
+    } finally {
+      setSalvando(false);
+    }
   };
+
+  if (carregando) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0066FF" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      
-      <Text style={styles.nomeUsuario}>Olá {usuario.nome}</Text>
+      <Text style={styles.nomeUsuario}>Olá {nome}</Text>
 
-      
+      <TextInput
+        style={styles.input}
+        value={nomeEditado}
+        onChangeText={setNomeEditado}
+        placeholder="Editar nome"
+      />
+      <Button title={salvando ? 'Salvando...' : 'Salvar'} onPress={salvarNome} disabled={salvando} />
+
       <View style={styles.infoContainer}>
         <View style={styles.infoBox1}>
-          
           <Text style={styles.infoLabel}>Pontos</Text>
-          <Text style={styles.infoValue}>{usuario.pontos}</Text>
+          <Text style={styles.infoValue}>{pontos}</Text>
         </View>
 
         <View style={styles.infoBox2}>
           <Text style={styles.infoLabel}>Nível</Text>
-
-          <Text style={styles.infoValue}>{usuario.nivel}</Text>
+          <Text style={styles.infoValue}>{nivel}</Text>
         </View>
       </View>
     </View>
@@ -37,7 +94,6 @@ export default Perfil;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     backgroundColor: '#ffffff',
     padding: 20,
     justifyContent: 'center',
@@ -47,13 +103,21 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 40,
+    marginBottom: 20,
   },
-
+  input: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    width: '80%',
+    marginBottom: 10,
+  },
   infoContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '80%',
+    marginTop: 30,
   },
   infoBox1: {
     alignItems: 'center',

@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, ActivityIndicator, Alert } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  ActivityIndicator,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; // Certifique-se de ter o pacote instalado
 
 interface Escovacao {
   id: string;
@@ -15,7 +24,7 @@ const Historico = () => {
   useEffect(() => {
     const buscarHistorico = async () => {
       try {
-        const response = await fetch('');
+        const response = await fetch('https://sua-api.com/escovacoes');
         if (!response.ok) {
           throw new Error('Erro ao buscar escovações');
         }
@@ -31,11 +40,41 @@ const Historico = () => {
     buscarHistorico();
   }, []);
 
+  const excluirItem = async (id: string) => {
+    Alert.alert('Confirmação', 'Deseja realmente excluir este item?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const response = await fetch(`https://sua-api.com/escovacoes/${id}`, {
+              method: 'DELETE',
+            });
+
+            if (!response.ok) {
+              throw new Error('Erro ao excluir item');
+            }
+
+            setHistorico((prev) => prev.filter((item) => item.id !== id));
+          } catch (error) {
+            Alert.alert('Erro', 'Não foi possível excluir o item.');
+          }
+        },
+      },
+    ]);
+  };
+
   const renderItem = ({ item }: { item: Escovacao }) => (
     <View style={styles.itemContainer}>
-      <Text style={styles.itemData}>{item.data}</Text>
-      <Text style={styles.itemHorario}>{item.horario}</Text>
-      <Text style={styles.itemPontos}>+{item.pontos} pontos</Text>
+      <TouchableOpacity onPress={() => excluirItem(item.id)} style={styles.deleteButton}>
+        <Ionicons name="trash-outline" size={20} color="#FF3333" />
+      </TouchableOpacity>
+      <View style={styles.itemContent}>
+        <Text style={styles.itemData}>{item.data}</Text>
+        <Text style={styles.itemHorario}>{item.horario}</Text>
+        <Text style={styles.itemPontos}>+{item.pontos} pontos</Text>
+      </View>
     </View>
   );
 
@@ -76,18 +115,21 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#f0f0f0',
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
+    elevation: 3,
+  },
+  deleteButton: {
+    marginRight: 15,
+  },
+  itemContent: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   itemData: {
     fontSize: 16,
