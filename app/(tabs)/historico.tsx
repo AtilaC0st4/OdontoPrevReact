@@ -8,8 +8,7 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Certifique-se de ter o pacote instalado
-
+import { Ionicons } from '@expo/vector-icons'; 
 interface Escovacao {
   id: string;
   data: string;
@@ -22,23 +21,31 @@ const Historico = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const buscarHistorico = async () => {
-      try {
-        const response = await fetch('https://sua-api.com/escovacoes');
-        if (!response.ok) {
-          throw new Error('Erro ao buscar escovações');
-        }
-        const dados = await response.json();
-        setHistorico(dados);
-      } catch (error) {
-        Alert.alert('Erro', 'Não foi possível carregar o histórico.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const buscarHistorico = async () => {
+    try {
+      console.log('Buscando histórico...');
+      const response = await fetch('http://10.0.2.2:7104/api/BrushingRecords');
 
-    buscarHistorico();
-  }, []);
+      if (!response.ok) {
+        console.log('Erro HTTP:', response.status);
+        throw new Error('Erro ao buscar escovações');
+      }
+
+      const dados = await response.json();
+      console.log('Dados recebidos:', dados);
+      setHistorico(dados);
+    } catch (error) {
+      console.log('Erro no fetch:', error);
+      Alert.alert('Erro', 'Não foi possível carregar o histórico.');
+    } finally {
+      console.log('Finalizando loading');
+      setLoading(false);
+    }
+  };
+
+  buscarHistorico();
+}, []);
+
 
   const excluirItem = async (id: string) => {
     Alert.alert('Confirmação', 'Deseja realmente excluir este item?', [
@@ -48,9 +55,10 @@ const Historico = () => {
         style: 'destructive',
         onPress: async () => {
           try {
-            const response = await fetch(`https://sua-api.com/escovacoes/${id}`, {
+            const response = await fetch(`http://10.0.2.2:7104/api/BrushingRecords/${id}`, {
               method: 'DELETE',
             });
+            
 
             if (!response.ok) {
               throw new Error('Erro ao excluir item');

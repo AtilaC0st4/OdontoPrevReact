@@ -4,28 +4,35 @@ import { Text, View } from '@/components/Themed';
 
 export default function Cadastro() {
   const salvarEscovacao = async () => {
-    const agora = new Date();
-    const data = agora.toLocaleDateString('pt-BR'); // Ex: 06/05/2025
-    const horario = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); // Ex: 14:30
+  const agora = new Date();
+  const data = agora.toLocaleDateString('pt-BR');
+  const horario = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-    try {
-      const response = await fetch('https://sua-api.com/escovacao', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ data, horario }),
-      });
+  try {
+    const response = await fetch('http://192.168.197.123:7104/api/BrushingRecords', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: 1, // ajuste conforme o usuário real
+        brushingTime: new Date().toISOString()
+      }),
+    });
 
-      if (response.ok) {
-        Alert.alert('Sucesso', `Check-in registrado em ${data} às ${horario}`);
-      } else {
-        Alert.alert('Erro', 'Falha ao registrar a escovação.');
-      }
-    } catch (error) {
-      Alert.alert('Erro', 'Erro ao conectar com a API.');
+    const responseData = await response.json();  // Lê a resposta da API como JSON
+    
+    if (response.ok) {
+      Alert.alert('Sucesso', `Check-in registrado em ${data} às ${horario}`);
+    } else {
+      Alert.alert('Erro', `Falha ao registrar a escovação: ${responseData.message || 'Desconhecido'}`);
     }
-  };
+  } catch (error) {
+    console.error('Erro ao conectar com a API:', error);
+    Alert.alert('Erro', 'Erro ao conectar com a API.');
+  }
+};
+
 
   return (
     <View style={styles.container}>
