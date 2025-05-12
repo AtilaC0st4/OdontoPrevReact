@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native'; // Importando useFocusEffect
 
 const Perfil = () => {
   const [nome, setNome] = useState('');
@@ -18,32 +19,35 @@ const Perfil = () => {
   const [salvando, setSalvando] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
 
-  useEffect(() => {
-    const carregarUsuario = async () => {
-      try {
-        const response = await fetch('http://192.168.25.10:5023/api/users');
-        const dados = await response.json();
+  // Carregar dados do usuário sempre que a tela for acessada
+  useFocusEffect(
+    React.useCallback(() => {
+      const carregarUsuario = async () => {
+        try {
+          const response = await fetch('http://192.168.25.10:5023/api/users');
+          const dados = await response.json();
 
-        const usuario = Array.isArray(dados) && dados.length > 0 ? dados[0] : null;
+          const usuario = Array.isArray(dados) && dados.length > 0 ? dados[0] : null;
 
-        if (usuario) {
-          setUserId(usuario.id);
-          setNome(usuario.name);
-          setNomeEditado(usuario.name);
-          setPontos(usuario.points ?? 0);
-          setNivel(usuario.level ?? Math.floor((usuario.points ?? 0) / 100));
-        } else {
-          Alert.alert('Erro', 'Usuário não encontrado.');
+          if (usuario) {
+            setUserId(usuario.id);
+            setNome(usuario.name);
+            setNomeEditado(usuario.name);
+            setPontos(usuario.points ?? 0);
+            setNivel(usuario.level ?? Math.floor((usuario.points ?? 0) / 100));
+          } else {
+            Alert.alert('Erro', 'Usuário não encontrado.');
+          }
+        } catch (error) {
+          Alert.alert('Erro', 'Não foi possível carregar os dados do usuário.');
+        } finally {
+          setCarregando(false);
         }
-      } catch (error) {
-        Alert.alert('Erro', 'Não foi possível carregar os dados do usuário.');
-      } finally {
-        setCarregando(false);
-      }
-    };
+      };
 
-    carregarUsuario();
-  }, []);
+      carregarUsuario();
+    }, [])
+  );
 
   const salvarNome = async () => {
     if (!nomeEditado.trim()) {
