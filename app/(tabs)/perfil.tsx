@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, ActivityIndicator, Alert } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Button,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 
 const Perfil = () => {
   const [nome, setNome] = useState('');
@@ -8,17 +16,25 @@ const Perfil = () => {
   const [nivel, setNivel] = useState(0);
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     const carregarUsuario = async () => {
       try {
-        const response = await fetch('https://suaapi.com/usuario');
+        const response = await fetch('http://192.168.25.10:5023/api/users');
         const dados = await response.json();
 
-        setNome(dados.nome);
-        setNomeEditado(dados.nome);
-        setPontos(dados.pontos);
-        setNivel(Math.floor(dados.pontos / 100)); // nível calculado aqui
+        const usuario = Array.isArray(dados) && dados.length > 0 ? dados[0] : null;
+
+        if (usuario) {
+          setUserId(usuario.id);
+          setNome(usuario.name);
+          setNomeEditado(usuario.name);
+          setPontos(usuario.points ?? 0);
+          setNivel(usuario.level ?? Math.floor((usuario.points ?? 0) / 100));
+        } else {
+          Alert.alert('Erro', 'Usuário não encontrado.');
+        }
       } catch (error) {
         Alert.alert('Erro', 'Não foi possível carregar os dados do usuário.');
       } finally {
@@ -35,12 +51,17 @@ const Perfil = () => {
       return;
     }
 
+    if (userId === null) {
+      Alert.alert('Erro', 'ID do usuário não encontrado.');
+      return;
+    }
+
     setSalvando(true);
     try {
-      const response = await fetch('https://suaapi.com/usuario', {
+      const response = await fetch(`http://192.168.25.10:5023/api/users/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome: nomeEditado }),
+        body: JSON.stringify({ id: userId, name: nomeEditado }),
       });
 
       if (!response.ok) throw new Error();

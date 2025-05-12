@@ -1,46 +1,56 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { Text, View } from '@/components/Themed';
 
 export default function Cadastro() {
+  const [loading, setLoading] = useState(false);
+
   const salvarEscovacao = async () => {
-  const agora = new Date();
-  const data = agora.toLocaleDateString('pt-BR');
-  const horario = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    setLoading(true); 
+    const agora = new Date();
+    const data = agora.toLocaleDateString('pt-BR');
+    const horario = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-  try {
-    const response = await fetch('http://192.168.197.123:7104/api/BrushingRecords', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userId: 1, // ajuste conforme o usuário real
-        brushingTime: new Date().toISOString()
-      }),
-    });
+    try {
+      const response = await fetch('http://192.168.25.10:5023/api/BrushingRecords', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: 1, 
+          brushingTime: new Date().toISOString()
+        }),
+      });
 
-    const responseData = await response.json();  // Lê a resposta da API como JSON
-    
-    if (response.ok) {
-      Alert.alert('Sucesso', `Check-in registrado em ${data} às ${horario}`);
-    } else {
-      Alert.alert('Erro', `Falha ao registrar a escovação: ${responseData.message || 'Desconhecido'}`);
+      
+      const responseData = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Sucesso', `Check-in registrado em ${data} às ${horario}`);
+      } else {
+        Alert.alert('Erro', `Falha ao registrar a escovação: ${responseData.message || 'Desconhecido'}`);
+      }
+    } catch (error) {
+      console.error('Erro ao conectar com a API:', error);
+      Alert.alert('Erro', 'Erro ao conectar com a API.');
+    } finally {
+      setLoading(false); 
     }
-  } catch (error) {
-    console.error('Erro ao conectar com a API:', error);
-    Alert.alert('Erro', 'Erro ao conectar com a API.');
-  }
-};
-
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Faça o check-in e garanta +10 pontos!</Text>
 
-      <TouchableOpacity style={styles.button} onPress={salvarEscovacao}>
-        <Text style={styles.buttonText}>Fazer Check-in</Text>
-      </TouchableOpacity>
+      
+      {loading ? (
+        <ActivityIndicator size="large" color="#0066FF" />
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={salvarEscovacao}>
+          <Text style={styles.buttonText}>Fazer Check-in</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
