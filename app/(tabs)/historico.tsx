@@ -1,15 +1,8 @@
 import React, { useState, useCallback } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  ActivityIndicator,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import HistoricoLista from '../../components/HistoricoLista';
+import MensagemCarregamento from '../../components/MensagemCarregamento';
 
 interface Escovacao {
   id: string;
@@ -26,21 +19,11 @@ const Historico = () => {
     useCallback(() => {
       const buscarHistorico = async () => {
         setLoading(true);
-
         try {
-          console.log('Buscando histórico...');
           const response = await fetch('http://192.168.25.10:5023/api/BrushingRecords');
-
-          if (!response.ok) {
-            console.log('Erro HTTP:', response.status);
-            throw new Error('Erro ao buscar escovações');
-          }
-
           const dados = await response.json();
-          console.log('Resposta da API:', dados);
 
           const lista = Array.isArray(dados) ? dados : dados?.items || [];
-
           const historicoFormatado = lista.map((item: any) => {
             const dataHora = new Date(item.brushingTime);
             return {
@@ -53,7 +36,6 @@ const Historico = () => {
 
           setHistorico(historicoFormatado);
         } catch (error) {
-          console.log('Erro no fetch:', error);
           Alert.alert('Erro', 'Não foi possível carregar o histórico.');
         } finally {
           setLoading(false);
@@ -76,12 +58,9 @@ const Historico = () => {
               method: 'DELETE',
             });
 
-            if (!response.ok) {
-              throw new Error('Erro ao excluir item');
-            }
-
+            if (!response.ok) throw new Error();
             setHistorico((prev) => prev.filter((item) => item.id !== id));
-          } catch (error) {
+          } catch {
             Alert.alert('Erro', 'Não foi possível excluir o item.');
           }
         },
@@ -89,36 +68,13 @@ const Historico = () => {
     ]);
   };
 
-  const renderItem = ({ item }: { item: Escovacao }) => (
-    <View style={styles.itemContainer}>
-      <TouchableOpacity onPress={() => excluirItem(item.id)} style={styles.deleteButton}>
-        <Ionicons name="trash-outline" size={20} color="#FF3333" />
-      </TouchableOpacity>
-      <View style={styles.itemContent}>
-        <Text style={styles.itemData}>{item.data}</Text>
-        <Text style={styles.itemHorario}>{item.horario}</Text>
-        <Text style={styles.itemPontos}>+{item.pontos} pontos</Text>
-      </View>
-    </View>
-  );
-
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>Histórico de Escovações</Text>
-
-      {loading ? (
-  <ActivityIndicator size="large" color="#0066FF" />
-) : historico.length === 0 ? (
-  <Text style={styles.mensagemVazia}>Nenhum registro encontrado.</Text>
-) : (
-  <FlatList
-    data={historico}
-    renderItem={renderItem}
-    keyExtractor={(item) => item.id}
-    contentContainerStyle={styles.lista}
-  />
-)}
-
+      <MensagemCarregamento loading={loading} vazio={!loading && historico.length === 0} />
+      {!loading && historico.length > 0 && (
+        <HistoricoLista historico={historico} onDelete={excluirItem} />
+      )}
     </View>
   );
 };
@@ -138,45 +94,4 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  lista: {
-    paddingBottom: 20,
-  },
-  itemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    elevation: 3,
-  },
-  deleteButton: {
-    marginRight: 15,
-  },
-  itemContent: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  itemData: {
-    fontSize: 16,
-    color: '#666',
-  },
-  itemHorario: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: 'bold',
-  },
-  itemPontos: {
-    fontSize: 16,
-    color: '#0066FF',
-    fontWeight: 'bold',
-  },
-  mensagemVazia: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: '#999',
-    marginTop: 50,
-  },
-  
 });
